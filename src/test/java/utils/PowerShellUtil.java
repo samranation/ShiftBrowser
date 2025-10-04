@@ -21,4 +21,25 @@ public class PowerShellUtil {
         }
     }
 
+    public String exec(String psCommand) {
+        try {
+            ProcessBuilder pb = new ProcessBuilder(
+                    "powershell.exe",
+                    "-NoProfile",
+                    "-NonInteractive",
+                    "-Command",
+                    psCommand
+            );
+            pb.redirectErrorStream(true);
+
+            Process process = pb.start();
+            String result = new String(process.getInputStream().readAllBytes());
+            process.waitFor();
+            return result.trim();
+
+        } catch (Exception e) {
+            throw new RuntimeException("PowerShell failed: " + psCommand, e);
+        }
+    }
+
 }

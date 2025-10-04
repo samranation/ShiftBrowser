@@ -1,24 +1,14 @@
 package tests;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import utils.DownloadShiftUtil;
 import utils.PowerShellUtil;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 
-import static org.awaitility.Awaitility.await;
+import java.io.File;
+import java.util.Arrays;
 
 public class Test02_InstallShiftAndVersionCheckTest extends TestBase {
 
@@ -26,12 +16,15 @@ public class Test02_InstallShiftAndVersionCheckTest extends TestBase {
 
     @BeforeClass
     public void setup() {
+        driver.get("https://shift.com/");
         this.shiftFiles = new DownloadShiftUtil().downloadShiftBrowserFile();
     }
 
     @Test(description = "Install Shift Browser ")
     public void Test02_InstallShiftBrowser()  {
-        
+        String installerPath = Arrays.stream(this.shiftFiles).findAny().get().toString();
+        String cmd = "Start-Process -FilePath \"" + installerPath.replace("\\","\\\\") + "\" -ArgumentList '/S' -Wait";
+        new PowerShellUtil().exec(cmd);
     }
 
     @AfterClass
