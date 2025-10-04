@@ -14,15 +14,12 @@ import java.nio.file.Path;
 
 public class Test01_DownloadShiftBrowserTest extends TestBase {
 
-    private Path downloadPath;
-    private WebDriverWait wait;
     private File[] shiftFiles;
 
     @BeforeClass
     public void setup()
     {
         driver.get("https://shift.com/");
-
     }
 
     @Test(description = "This test downloads and verifies the browser version from .exe meta data")
