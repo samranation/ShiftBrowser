@@ -61,7 +61,7 @@ public class BrowserVersionCheckTest extends TestBase {
     }
 
     @Test(description = "Check Version of installed shift browser ", priority = 2)
-    public void Test02_InstallShiftBrowser() throws InterruptedException {
+    public void Test02_CheckVersionOfInstalledBrowser() throws InterruptedException {
         // wait until browser has fully loaded after installation:
         By quickSettings = AppiumBy.name("Quick Settings");
         new WebDriverWait(AppiumUtil.app, Duration.ofSeconds(30))
