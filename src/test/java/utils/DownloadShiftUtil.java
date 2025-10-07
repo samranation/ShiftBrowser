@@ -1,9 +1,7 @@
 package utils;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import tests.TestBase;
@@ -12,6 +10,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.await;
@@ -31,7 +30,15 @@ public class DownloadShiftUtil extends TestBase {
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("arguments[0].scrollIntoView(true);", downloadButton);
 
-        downloadButton.click();
+        try {
+            new Actions(driver).doubleClick(downloadButton).perform();
+            try {
+                wait.withTimeout(Duration.ofSeconds(3))
+                        .until(ExpectedConditions.stalenessOf(downloadButton));
+            } catch (TimeoutException ignore) {
+                downloadButton.click();
+            }
+        } catch (Exception ignore) {}
 
         Path browserDir = TestBase.DOWNLOAD_DIR;
 
@@ -43,5 +50,11 @@ public class DownloadShiftUtil extends TestBase {
         });
 
         return shiftFiles;
+    }
+
+    public void installShift() {
+        String installerPath = Arrays.stream(this.shiftFiles).findAny().get().toString();
+        String cmd = "Start-Process -FilePath \"" + installerPath.replace("\\","\\\\") + "\"; Start-Sleep -Seconds 10";
+        new PowerShellUtil().exec(cmd);
     }
 }

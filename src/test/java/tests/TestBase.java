@@ -29,6 +29,7 @@ public class TestBase {
     protected static Path DOWNLOAD_DIR = Paths.get(System.getProperty("user.home"), "Downloads", "browser");
     protected static WebDriverWait wait;
     protected static WindowsDriver driverWindows;
+    protected static String SHIFT_BASE_URL = "https://shift.com/";
 
     @BeforeClass
     public void setUp() throws IOException {
