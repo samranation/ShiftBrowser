@@ -120,6 +120,7 @@ public class TestBase {
             for (File file : path) {
                 if (file.exists()) {
                         file.delete();
+                        logger.info("successfully deleted file " + file.getAbsolutePath());
                 }
             }
         }

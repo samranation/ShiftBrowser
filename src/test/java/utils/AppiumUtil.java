@@ -50,7 +50,7 @@ public class AppiumUtil extends TestBase {
         WindowsDriver desktop = new WindowsDriver(this.appiumServerUrl(), root);
 
         if (element.equals("//*[@Name='Untitled - Shift Browser']")) {
-            WebElement eulaCheckbox = defaultAppiumWait().until(ExpectedConditions.presenceOfElementLocated(
+            WebElement eulaCheckbox = customAppiumWait(60).until(ExpectedConditions.presenceOfElementLocated(
                     AppiumBy.xpath("//CheckBox[@Name='EULA and Privacy Policy Checkbox']"))
             );
             defaultAppiumWait().until(ExpectedConditions.elementToBeClickable(eulaCheckbox));
