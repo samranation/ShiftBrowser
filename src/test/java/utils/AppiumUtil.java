@@ -4,73 +4,83 @@ import io.appium.java_client.AppiumBy;
 import io.appium.java_client.windows.WindowsDriver;
 import io.appium.java_client.windows.options.WindowsOptions;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.LoggerFactory;
+import tests.TestBase;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.logging.Logger;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 
-public class AppiumUtil {
+public class AppiumUtil extends TestBase {
 
-    public static WebElement shiftWindow;
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(AppiumUtil.class);
     public static WindowsDriver app;
+    private Logger logger = Logger.getLogger(AppiumUtil.class.getName());
+    public static Path shiftExe;
+    public static WebElement browserWindow;
 
-    public void startAppium() {
-        Path shiftExe = Paths.get(System.getenv("LOCALAPPDATA"), "Shift", "chromium", "shift.exe");
-        await()
-                .pollInterval(2, SECONDS)
+    public void startAppium(String element) {
+        shiftExe = Paths.get(System.getenv("LOCALAPPDATA"), "Shift", "chromium", "shift.exe");
+        await().pollInterval(2, SECONDS)
                 .atMost(3, MINUTES)
                 .ignoreExceptions()
-                .until(() -> Files.exists(shiftExe) && Files.isRegularFile(shiftExe));
+                .until(() -> Files.isRegularFile(shiftExe));
 
-        await().pollDelay(10, SECONDS)
-                .pollInterval(5, SECONDS)
-                .atMost(1, MINUTES).until(() -> {
+        WindowsOptions launch = new WindowsOptions()
+                .setApp(shiftExe.toString())
+                .amend("appium:newCommandTimeout", 900);
+        app = new WindowsDriver(this.appiumServerUrl(), launch);
+        logger.info("Shift launched; waiting for its top-level window…");
 
-                    WindowsOptions root = new WindowsOptions()
-                            .setPlatformName("Windows")
-                            .setAutomationName("Windows")
-                            .setApp("Root");
-                    WindowsDriver desktop = new WindowsDriver(new URL("http://127.0.0.1:4725"), root);
+        WindowsOptions root = new WindowsOptions()
+                .setPlatformName("Windows")
+                .setAutomationName("Windows")
+                .setApp("Root");
+        WindowsDriver desktop = new WindowsDriver(this.appiumServerUrl(), root);
 
-                    By shiftWin = AppiumBy.xpath(
-                            "//*[@Name='Untitled - Shift Browser']"
-                    );
-                    this.shiftWindow = new WebDriverWait(desktop, Duration.ofSeconds(45))
-                            .until(ExpectedConditions.presenceOfElementLocated(shiftWin));
+        if (element.equals("//*[@Name='Untitled - Shift Browser']")) {
+            WebElement eulaCheckbox = defaultAppiumWait().until(ExpectedConditions.presenceOfElementLocated(
+                    AppiumBy.xpath("//CheckBox[@Name='EULA and Privacy Policy Checkbox']"))
+            );
+            defaultAppiumWait().until(ExpectedConditions.elementToBeClickable(eulaCheckbox));
+        }
 
-                    this.shiftWindow.click();
+        By shiftWin = AppiumBy.xpath(element);
+        browserWindow = new WebDriverWait(desktop, Duration.ofSeconds(60))
+                .until(ExpectedConditions.presenceOfElementLocated(shiftWin));
 
-                    String handleHex = Integer.toHexString(
-                            Integer.parseInt(this.shiftWindow.getAttribute("NativeWindowHandle"))
-                    );
+        String handleHex = Integer.toHexString(
+                Integer.parseInt(browserWindow.getAttribute("NativeWindowHandle"))
+        ).toUpperCase();
 
-                    WindowsOptions attach = new WindowsOptions()
-                            .setAppTopLevelWindow(handleHex)
-                            .amend("appium:newCommandTimeout", 900);
+        WindowsOptions attach = new WindowsOptions()
+                .setAppTopLevelWindow(handleHex)
+                .amend("appium:newCommandTimeout", 900);
+        app = new WindowsDriver(this.appiumServerUrl(), attach);
+        logger.info("Ready to start testing!");
 
-                    app = new WindowsDriver(new URL("http://127.0.0.1:4725"), attach);
+        // Bring to foreground
+        browserWindow.click();
+        logger.info("Shift window found and focused.");
+    }
 
-                    WebDriverWait wait = new WebDriverWait(app, Duration.ofSeconds(5));
-                    boolean eulaCheckboxDisplayed = false;
-                    try {
-                        wait.until(ExpectedConditions.presenceOfElementLocated(
-                                AppiumBy.xpath("//CheckBox[@Name='EULA and Privacy Policy Checkbox']"))
-                        );
-                        eulaCheckboxDisplayed = true;
-                    } catch (WebDriverException ignore) {}
-
-                    return eulaCheckboxDisplayed;
-                });
+    private URL appiumServerUrl() {
+        try {
+            return new URL("http://127.0.0.1:4725");
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

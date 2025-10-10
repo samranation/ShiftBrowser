@@ -3,53 +3,58 @@ package pages;
 import io.appium.java_client.AppiumBy;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.Assert;
-import utils.AppiumUtil;
+import tests.TestBase;
 import utils.ClickUtil;
 
 import java.time.Duration;
 
-public class IntroPage {
+import static org.awaitility.Awaitility.await;
+
+public class IntroPage extends TestBase {
 
     public void togglePrivacyPolicyAcceptance() {
-        WebDriverWait wait = new WebDriverWait(AppiumUtil.app, Duration.ofSeconds(30));
-        WebElement eulaCheckbox = wait.until(ExpectedConditions.presenceOfElementLocated(
-                AppiumBy.xpath("//CheckBox[@Name='EULA and Privacy Policy Checkbox']"))
-        );
-        wait.until(ExpectedConditions.elementToBeClickable(eulaCheckbox));
+        await().atMost(Duration.ofSeconds(45)).until(() -> {
+            WebElement eulaCheckbox = defaultAppiumWait().until(ExpectedConditions.presenceOfElementLocated(
+                    AppiumBy.xpath("//CheckBox[@Name='EULA and Privacy Policy Checkbox']"))
+            );
+            defaultAppiumWait().until(ExpectedConditions.elementToBeClickable(eulaCheckbox));
 
-        // checkbox
-        String state = eulaCheckbox.getAttribute("Toggle.ToggleState");
-        if ("0".equals(state)) {
-            eulaCheckbox.click();
-            wait.until(d -> "1".equals(eulaCheckbox.getAttribute("Toggle.ToggleState")));
-        }
+            // toggle checkbox
+            String state = eulaCheckbox.getAttribute("Toggle.ToggleState");
+            if ("0".equals(state)) {
+                eulaCheckbox.click();
+                defaultAppiumWait().until(d -> "1".equals(eulaCheckbox.getAttribute("Toggle.ToggleState")));
+            }
+            return eulaCheckbox.getAttribute("Toggle.ToggleState").equals("1");
+        });
+
     }
 
-    public void finishInstallationSteps() throws InterruptedException {
-        new ClickUtil().robustClickOnElement("Go to next step", AppiumUtil.app);
+    public void finishInstallationSteps() {
+        ClickUtil clickUtil = new ClickUtil();
+        // welcome to shift
+        clickUtil.robustClickOnElement("//Button[contains(@Name,'Go to next step')]",
+                "//Text[contains(@Name,'Create Spaces')]");
 
-        // Thread sleep is not ideal as we would want to use implicit waits
-        // if time permitted, I would implement the following check instead of a thread sleep:
-//        String text =
-//        AppiumUtil.app.findElement(AppiumBy.xpath("//Text[contains(@Name,'Create Spaces')]")).getText();
-//        Assert.assertTrue(text.contains("Create Spaces"));
-        // not sure if this works as I wasn't able to test in time.
+        // create spaces
+        clickUtil.robustClickOnElement("//Button[contains(@Name,'Go to next step')]",
+                "//Text[contains(@Name,'Edit, add, or remove')]");
 
-        Thread.sleep(3000);
+        // Add apps to your spaces
+        clickUtil.robustClickOnElement("//Text[contains(@Name,'Skip without adding apps')]",
+                "//Text[contains(@Name, 'Shift measures and offsets')]");
 
-        new ClickUtil().robustClickOnElement("Go to next step", AppiumUtil.app);
+        // you've switched...
+        clickUtil.robustClickOnElement("//Button[contains(@Name,'Continue')]",
+                "//Text[contains(@Name,'The Original Shiftie')]");
 
-        new ClickUtil().robustClickOnElement("Skip without adding apps", AppiumUtil.app);
+        // choose your template
+        clickUtil.robustClickOnElement("//Button[contains(@Name,'Select this template and continue')]",
+                "//Button[contains(@Name,'Open Shift')]");
 
-        new ClickUtil().robustClickOnElement("Continue", AppiumUtil.app);
-
-        new ClickUtil().robustClickOnElement("Select this template and continue", AppiumUtil.app);
-
-        AppiumUtil.shiftWindow.click();
-
-        new ClickUtil().robustClickOnElement("Open Shift", AppiumUtil.app);
+        clickUtil.robustClickOnElement("(//Group[@Name='Controls']//Button[@Name='Open Shift']" +
+                        " | //Button[contains(@Name,'Open Shift')])",
+                "//Button[contains(@Name,'New Tab')]");
     }
 
 }

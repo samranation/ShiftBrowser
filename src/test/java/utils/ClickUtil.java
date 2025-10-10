@@ -3,38 +3,74 @@ package utils;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.windows.WindowsDriver;
 import org.openqa.selenium.*;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import tests.TestBase;
 
 import java.time.Duration;
 
-public class ClickUtil {
+import static org.awaitility.Awaitility.await;
 
-    public void robustClickOnElement(String elementByName, WindowsDriver app) {
-        WebDriverWait wait = new WebDriverWait(app, Duration.ofSeconds(30));
+public class ClickUtil extends TestBase {
 
-        By by = AppiumBy.name(elementByName);
-        try {
-            WebElement btn = new WebDriverWait(app, Duration.ofSeconds(30))
-                    .until(ExpectedConditions.refreshed(ExpectedConditions.elementToBeClickable(by)));
+    private final WindowsDriver app = AppiumUtil.app;
 
-            new WebDriverWait(app, Duration.ofSeconds(5)).until(d ->
-                    "True".equals(btn.getAttribute("IsEnabled")) && !"True".equals(btn.getAttribute("IsOffscreen")));
+    public void robustClickOnElement(String element, String nextPageTitleElement) {
+        await()
+                .atMost(Duration.ofSeconds(45))
+                .pollInterval(Duration.ofMillis(400))
+                .ignoreExceptions()
+                .until(() -> {
+                    By btnBy = AppiumBy.xpath(element);
 
-            new Actions(app).doubleClick(btn).perform();
+                    WebElement btn = defaultAppiumWait()
+                            .until(ExpectedConditions.refreshed(ExpectedConditions.elementToBeClickable(btnBy)));
 
-            // check element has become stale
-            try {
-                wait.withTimeout(Duration.ofSeconds(3))
-                        .until(ExpectedConditions.stalenessOf(btn));
-            } catch (TimeoutException ignore) {
-                app.findElement(by).click();
-            }
+                    customAppiumWait(5).until(d ->
+                            "True".equals(btn.getAttribute("IsEnabled"))
+                                    && !"True".equals(btn.getAttribute("IsOffscreen")));
 
-        } catch (WebDriverException ignore) {
-            app.findElement(by).sendKeys(Keys.ENTER);
-        }
+                    if (element.contains("Open Shift")) {
+                        btn.sendKeys(Keys.ENTER);
+                    } else {
+                        try {
+                            btn.click();
+                        } catch (WebDriverException e) {
+                            try {
+                                app.findElement(btnBy).sendKeys(Keys.ENTER);
+                            } catch (WebDriverException e1) {
+                                app.findElement(btnBy).sendKeys(Keys.SPACE);
+                            }
+                        }
+                    }
+
+                    By nextBy = robustNextBy(nextPageTitleElement);
+
+                    try {
+                        new WebDriverWait(app, Duration.ofSeconds(6))
+                                .until(ExpectedConditions.or(
+                                        ExpectedConditions.visibilityOfElementLocated(nextBy),
+                                        ExpectedConditions.stalenessOf(btn),
+                                        ExpectedConditions.invisibilityOfElementLocated(btnBy),
+                                        ExpectedConditions.not(ExpectedConditions.presenceOfAllElementsLocatedBy(btnBy))
+                                ));
+                        return true;
+                    } catch (TimeoutException te) {
+                        return false;
+                    }
+                });
     }
 
+    private By robustNextBy(String originalNextXpath) {
+        if (originalNextXpath != null && !originalNextXpath.isBlank()) {
+            return AppiumBy.xpath(
+                    "("+ originalNextXpath + ") | " +
+                            // Fallbacks: any element with that text fragment
+                            "//*[contains(@Name,'Create Spaces') or contains(@Name,'Create spaces') or contains(@Name,'Create Space') or contains(@Name,'Spaces') or contains(@Name,'Create')]"
+            );
+        }
+        return AppiumBy.xpath(
+                "//*[contains(@Name,'Create Spaces') or contains(@Name,'Create spaces') or contains(@Name,'Create')]"
+        );
+    }
 }

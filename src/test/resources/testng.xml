@@ -1,0 +1,11 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="MySuite" verbose="1">
+    <test name="API Tests">
+        <classes>
+            <class name="tests.Test01_CheckVersionFromMetaDataTest"/>
+            <class name="tests.Test02_CheckVersionOfInstalledBrowserTest"/>
+            <class name="tests.Test03_BrowserNavigationTest"/>
+            <class name="tests.Test04_SaveBookmarksTest"/>
+        </classes>
+    </test>
+</suite>
