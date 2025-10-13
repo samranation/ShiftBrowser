@@ -103,18 +103,18 @@ public class TestBase {
         AppiumUtil.app.closeApp();
     }
 
-//    @AfterSuite
-//    public void afterSuite() {
-//        Path inno = Paths.get(System.getenv("LOCALAPPDATA"), "Shift", "unins000.exe");
-//
-//        String cmd = "Start-Process -FilePath '" + inno + "' -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait";
-//        String result = new PowerShellUtil().exec(cmd);
-//        Assert.assertEquals(result, "", "Shift never uninstalled");
-//        logger.info("Shift uninstalled successfully ");
-//
-//        this.deleteInstallationFilesInDownloads(this.shiftFiles);
-//    }
-//
+    @AfterSuite
+    public void afterSuite() {
+        Path inno = Paths.get(System.getenv("LOCALAPPDATA"), "Shift", "unins000.exe");
+
+        String cmd = "Start-Process -FilePath '" + inno + "' -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait";
+        String result = new PowerShellUtil().exec(cmd);
+        Assert.assertEquals(result, "", "Shift never uninstalled");
+        logger.info("Shift uninstalled successfully ");
+
+        this.deleteInstallationFilesInDownloads(this.shiftFiles);
+    }
+
     private void deleteInstallationFilesInDownloads(File[] path) {
         if (path != null) {
             for (File file : path) {
