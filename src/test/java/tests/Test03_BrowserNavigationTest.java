@@ -16,8 +16,6 @@ public class Test03_BrowserNavigationTest extends TestBase {
 
     @Test(description = "Shift browser navigation test")
     public void test03_navigationTest() {
-        new AppiumUtil().startAppium("//*[@ClassName='Chrome_WidgetWin_1' and contains(@Name,'- Shift Browser')]");
-
         BrowserNavigationPage browserNavigationPage = new BrowserNavigationPage();
         browserNavigationPage.checkBrowserNavigationPageHasLoaded();
         String shitRoleText = browserNavigationPage.navigateToRedBrickCareerWebsite();
