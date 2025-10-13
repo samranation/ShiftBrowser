@@ -25,31 +25,64 @@ or in Intellij:
 - TestNg
 - Appium
 
-## Test Architecture 
+## Test Architecture
 
-1. Before Suite:
-   2. Deletes existing installation files 
-   3. Start Firefox and download Shift installation files
-   3. Start Appium session
-   3. Install Shift and go through Shift Setup screen
-   4. Closes App
-5. After Suite:
-   6. Uninstall Shift 
-   7. Delete installation files 
-8. Test01_CheckVersionFromMetaDataTest
-   9. uses PowerShell util to retrieve version from metadata 
-10. Test02_CheckVersionOfInstalledBrowserTest
-    11. Starts a new browser appium session
-    12. navigates to browser settings and retrieves version from page and validates against installation metadata version
-13. Test03_BrowserNavigationTest
-    14. Starts a new browser appium session
-    15. navigates to redbrick website and checks page text to verify role is still available
-    16. (if time permitted I would try to find text in particular block rather than get text from whole page)
-17. Test04_SaveBookmarksTest
-    18. Starts a new browser appium session
-    19. (if time permitted I would firstly delete previous bookmarks if present)
-    20. Navigates to career website and saves bookmark
-    21. checks bookmark setting page shows the bookmark 
-    22. After class will delete the bookmark (if time permitted rather than staying on page, probably better to re-navigate to this page in a new session)
+### Before Suite
 
+1. Deletes existing installation files
+2. Starts **Firefox** and downloads the Shift installation files
+3. Starts **Appium session**
+4. Installs **Shift** and goes through the setup screen
+5. Closes the app
 
+---
+
+### After Suite
+
+1. Uninstalls **Shift**
+2. Deletes installation files
+
+---
+
+### Test Cases
+
+#### **Test01 — Check Version from Metadata**
+- Uses **PowerShell utility** to retrieve the version from the installer metadata.
+
+---
+
+#### **Test02 — Check Version of Installed Browser**
+- Starts a **new Appium browser session**
+- Navigates to browser **settings**
+- Retrieves version from the settings page
+- Validates it against the **installation metadata version**
+
+---
+
+#### **Test03 — Browser Navigation Test**
+- Starts a **new Appium browser session**
+- Navigates to the **Redbrick website**
+- Verifies that the **“Role Available”** text appears on the page
+- _If time permitted_: refine validation to look for text within a specific content block instead of the whole page
+
+---
+
+#### **Test04 — Save Bookmarks Test**
+- Starts a **new Appium browser session**
+- _If time permitted_: delete previous bookmarks if present
+- Navigates to the **career website** and saves a bookmark
+- Verifies that the **bookmark appears** in the settings page
+- _After class_: delete the bookmark (ideally by starting a new session rather than staying on the same page)
+
+---
+
+### Summary
+
+This suite ensures:
+- The **Shift browser installs and uninstalls cleanly**
+- Version consistency between **metadata** and **installed application**
+- Core browser functionality such as **navigation** and **bookmarking** works correctly
+
+---
+
+**Author:** Amrik Singh Samra  
