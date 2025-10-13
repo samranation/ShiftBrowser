@@ -5,9 +5,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import pages.BrowserNavigationPage;
-import pages.BrowserSettingsPage;
 import utils.AppiumUtil;
-import utils.VersionUtil;
 
 public class Test03_BrowserNavigationTest extends TestBase {
 
@@ -29,6 +27,6 @@ public class Test03_BrowserNavigationTest extends TestBase {
 
     @AfterClass
     public void afterClass() {
-        this.minimizeWindowAndCloseApp();
+        this.restoreWindowAndCloseApp();
     }
 }

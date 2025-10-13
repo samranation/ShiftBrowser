@@ -8,6 +8,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import tests.TestBase;
 
 import java.time.Duration;
+import java.util.logging.Logger;
 
 import static org.awaitility.Awaitility.await;
 
@@ -22,17 +23,16 @@ public class ClickUtil extends TestBase {
                 .ignoreExceptions()
                 .until(() -> {
                     By btnBy = AppiumBy.xpath(element);
+                    WebElement btn;
 
-                    WebElement btn = defaultAppiumWait()
-                            .until(ExpectedConditions.refreshed(ExpectedConditions.elementToBeClickable(btnBy)));
-
-                    customAppiumWait(5).until(d ->
-                            "True".equals(btn.getAttribute("IsEnabled"))
-                                    && !"True".equals(btn.getAttribute("IsOffscreen")));
-
+                    // for some reason the open shift button is difficult to click
                     if (element.contains("Open Shift")) {
-                            btn.sendKeys(Keys.ENTER);
+                        btn = app.findElement(btnBy);
+                        btn.sendKeys(Keys.TAB);
+                        btn.sendKeys(Keys.ENTER);
                     } else {
+                        btn = defaultAppiumWait()
+                                .until(ExpectedConditions.refreshed(ExpectedConditions.elementToBeClickable(btnBy)));
                         try {
                             btn.click();
                         } catch (WebDriverException e) {

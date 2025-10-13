@@ -18,9 +18,9 @@ public class BrowserSettingsPage extends TestBase {
 
     public String checkVersionInAdvancedSettings() {
         ClickUtil clickUtil = new ClickUtil();
-        clickUtil.robustClickOnElement("Quick Settings",
+        clickUtil.robustClickOnElement("//Button[@Name='Quick Settings']",
                 "//Button[contains(@Name,'Advanced Settings')]");
-        clickUtil.robustClickOnElement("Advanced Settings",
+        clickUtil.robustClickOnElement("//Button[contains(@Name,'Advanced Settings')]",
                 "//Text[contains(@Name,'Version')]");
         WebElement versionEl = AppiumUtil.app.findElement(
                 AppiumBy.xpath("//Text[contains(@Name,'Version')]")

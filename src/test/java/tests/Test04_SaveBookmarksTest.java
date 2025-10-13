@@ -5,13 +5,14 @@ import org.testng.Assert;
 import org.testng.annotations.*;
 import pages.BrowserBookmarkPage;
 import pages.BrowserNavigationPage;
-import utils.*;
 
 public class Test04_SaveBookmarksTest extends TestBase {
 
     @BeforeClass
     public void beforeClass(){
         this.startBrowserAndMaximizeWindow();
+        // would be wise to implement a check here to see if there are existing
+        // bookmarks. if so, we should delete them before performing the test
     }
 
     @Test
@@ -33,6 +34,6 @@ public class Test04_SaveBookmarksTest extends TestBase {
         Assert.assertTrue(webElement.isDisplayed(),
                 "Bookmark did not delete.");
 
-        this.minimizeWindowAndCloseApp();
+        this.restoreWindowAndCloseApp();
     }
 }

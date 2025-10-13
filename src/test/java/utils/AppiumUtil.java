@@ -37,10 +37,16 @@ public class AppiumUtil extends TestBase {
                 .ignoreExceptions()
                 .until(() -> Files.isRegularFile(shiftExe));
 
-        WindowsOptions launch = new WindowsOptions()
-                .setApp(shiftExe.toString())
-                .amend("appium:newCommandTimeout", 900);
-        app = new WindowsDriver(this.appiumServerUrl(), launch);
+        await().atMost(Duration.ofMinutes(2))
+                .ignoreExceptions()
+                .until(() -> {
+                    WindowsOptions launch = new WindowsOptions()
+                            .setApp(shiftExe.toString())
+                            .amend("appium:newCommandTimeout", 900);
+                    app = new WindowsDriver(this.appiumServerUrl(), launch);
+                    String title = app.getTitle();
+                    return title != null && !title.isEmpty();
+                });
         logger.info("Shift launched; waiting for its top-level window…");
 
         WindowsOptions root = new WindowsOptions()

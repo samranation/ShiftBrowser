@@ -1,15 +1,11 @@
 package tests;
 
-import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import pages.BrowserBookmarkPage;
 import pages.BrowserSettingsPage;
 import utils.VersionUtil;
-
-import java.util.logging.Logger;
 
 public class Test02_CheckVersionOfInstalledBrowserTest extends TestBase {
 
@@ -18,7 +14,7 @@ public class Test02_CheckVersionOfInstalledBrowserTest extends TestBase {
         this.startBrowserAndMaximizeWindow();
     }
 
-    @Test(description = "Check Version of installed shift browser ", priority = 2)
+    @Test(description = "Check Version of installed shift browser ")
     public void test02_CheckVersionOfInstalledBrowserTest()  {
         BrowserSettingsPage browserSettingsPage = new BrowserSettingsPage();
         browserSettingsPage.checkBrowserSettingsPageHasLoaded();
@@ -29,6 +25,6 @@ public class Test02_CheckVersionOfInstalledBrowserTest extends TestBase {
 
     @AfterClass
     public void afterClass() {
-        this.minimizeWindowAndCloseApp();
+        this.restoreWindowAndCloseApp();
     }
 }

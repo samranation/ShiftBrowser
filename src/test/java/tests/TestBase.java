@@ -2,6 +2,7 @@ package tests;
 
 import io.appium.java_client.AppiumBy;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
@@ -65,10 +66,8 @@ public class TestBase {
             IntroPage introPage = new IntroPage();
             introPage.togglePrivacyPolicyAcceptance();
             introPage.finishInstallationSteps();
+            AppiumUtil.app.closeApp();
         }
-
-//         close browser
-        AppiumUtil.app.closeApp();
 
 //         quit firefox
         if (firefoxDriver != null) {
@@ -88,19 +87,30 @@ public class TestBase {
     protected void startBrowserAndMaximizeWindow() {
         new AppiumUtil().startAppium("//*[@ClassName='Chrome_WidgetWin_1' and contains(@Name,'- Shift Browser')]");
         // maximize app
-        WebElement maximize = customAppiumWait(10).until(ExpectedConditions.elementToBeClickable(
-                AppiumBy.xpath("//*[@ClassName='Chrome_RenderWidgetHostHWND']" +
-                        "//*[self::Text or @LocalizedControlType='button'][@Name='Maximize']")));
-        maximize.click();
+        // browser might already be maximized because shift honors the previous settings
+        // and after class may not have run after test has completed
+        if (this.restoreElement() == null) {
+            WebElement maximize = customAppiumWait(10).until(ExpectedConditions.elementToBeClickable(
+                    AppiumBy.xpath("//*[@ClassName='Chrome_RenderWidgetHostHWND']" +
+                            "//*[self::Text or @LocalizedControlType='button'][@Name='Maximize']")));
+            maximize.click();
+        }
     }
 
-    protected void minimizeWindowAndCloseApp() {
+    protected void restoreWindowAndCloseApp() {
         // maximize app
-        WebElement minimize = customAppiumWait(10).until(ExpectedConditions.elementToBeClickable(
-                AppiumBy.xpath("//*[@ClassName='Chrome_RenderWidgetHostHWND']" +
-                        "//*[self::Text or @LocalizedControlType='button'][@Name='Minimize']")));
-        minimize.click();
+        this.restoreElement().click();
         AppiumUtil.app.closeApp();
+    }
+
+    private WebElement restoreElement() {
+        WebElement element = null;
+        try {
+            element =  customAppiumWait(10).until(ExpectedConditions.elementToBeClickable(
+                    AppiumBy.xpath("//*[@ClassName='Chrome_RenderWidgetHostHWND']" +
+                            "//*[self::Text or @LocalizedControlType='button'][@Name='Restore']")));
+        } catch (WebDriverException ignore) {}
+        return element;
     }
 
     @AfterSuite
