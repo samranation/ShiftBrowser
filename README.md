@@ -85,4 +85,8 @@ This suite ensures:
 
 ---
 
-**Author:** Amrik Singh Samra  
+## Test Report 
+
+![img.png](img.png)
+
+![img_1.png](img_1.png)
