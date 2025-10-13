@@ -31,7 +31,7 @@ public class ClickUtil extends TestBase {
                                     && !"True".equals(btn.getAttribute("IsOffscreen")));
 
                     if (element.contains("Open Shift")) {
-                        btn.sendKeys(Keys.ENTER);
+                            btn.sendKeys(Keys.ENTER);
                     } else {
                         try {
                             btn.click();
